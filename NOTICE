@@ -1,0 +1,17 @@
+问墨输入法（Wenmo Input Method）
+Copyright 2026 Wenmo contributors
+
+This product includes software developed by Wenmo contributors.
+
+The bundled Resources/cedict_pinyin.tsv is derived from CC-CEDICT and is
+licensed under Creative Commons Attribution-ShareAlike 4.0 International.
+It contains the pinyin, simplified-form, and traditional-form fields; English
+definitions were removed. Entries were normalized, grouped by untoned pinyin,
+ordered for input-method use, and capped during index generation.
+
+CC-CEDICT: https://cc-cedict.org/
+License: https://creativecommons.org/licenses/by-sa/4.0/
+
+Unicode Unihan data was used during generation to help order common characters.
+Unicode copyright and license terms are included in
+Resources/licenses/UNICODE-LICENSE.txt.

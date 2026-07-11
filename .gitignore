@@ -1,0 +1,35 @@
+# Build products and Swift compiler caches
+.build/
+DerivedData/
+*.dSYM/
+*.swiftmodule
+*.swiftdoc
+*.swiftsourceinfo
+
+# Xcode user-specific state (if an Xcode project is added later)
+xcuserdata/
+*.xcuserstate
+
+# macOS metadata and local editor files
+.DS_Store
+.AppleDouble
+.LSOverride
+*~
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Local signing material and packaged artifacts
+*.cer
+*.p12
+*.mobileprovision
+*.pkg
+*.dmg
+*.zip
+
+# Local environment and logs
+.env
+.env.*
+!.env.example
+*.log
