@@ -45,11 +45,10 @@ test:
 	mkdir -p "$(BUILD)/ModuleCache"
 	$(SWIFTC) -typecheck -parse-as-library -framework AppKit -framework InputMethodKit -framework Carbon $(SOURCES)
 
-dmg: $(BUNDLE) DMG安装说明.txt
+dmg: $(BUNDLE)
 	rm -rf "$(DMG_ROOT)" "$(DMG)"
 	mkdir -p "$(DMG_ROOT)"
 	ditto --norsrc "$(BUNDLE)" "$(DMG_ROOT)/问墨.app"
-	cp DMG安装说明.txt "$(DMG_ROOT)/安装说明.txt"
 	hdiutil create -volname "问墨输入法 1.0.6" -srcfolder "$(DMG_ROOT)" \
 		-ov -format UDZO "$(DMG)"
 	@echo "DMG 已生成：$(DMG)"
