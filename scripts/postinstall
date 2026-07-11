@@ -1,0 +1,27 @@
+#!/bin/bash
+set -e
+
+login_user=$(/usr/bin/stat -f%Su /dev/console)
+app_root="${3}/Library/Input Methods/问墨.app"
+executable="${app_root}/Contents/MacOS/WenmoInputMethod"
+
+/usr/bin/killall WenmoInputMethod >/dev/null 2>&1 || true
+"${executable}" --register-input-source
+
+if [ "${login_user}" != "root" ] && [ "${login_user}" != "loginwindow" ]; then
+  enabled=false
+  for attempt in 1 2 3 4 5; do
+    if /usr/bin/sudo -u "${login_user}" "${executable}" --enable-input-source; then
+      enabled=true
+      break
+    fi
+    /bin/sleep 1
+  done
+  if [ "${enabled}" = true ]; then
+    /usr/bin/sudo -u "${login_user}" "${executable}" --select-input-source || true
+  else
+    echo "Wenmo was registered; macOS has not refreshed the input-source cache yet."
+  fi
+fi
+
+exit 0

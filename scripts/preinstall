@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+# Remove the incorrectly located copy produced by version 1.0.1 so
+# LaunchServices does not see the same bundle identifier at two paths.
+/bin/rm -rf "${3}/Library/Input Library/问墨.app"
+
+exit 0

@@ -44,6 +44,19 @@ final class InputController: IMKInputController {
         default: break
         }
 
+        // Number keys select the visible candidate directly. Handle them before
+        // the generic non-letter path, which otherwise commits candidate 1 and
+        // lets the digit pass through to the client (for example, "策士4").
+        if !engine.composition.isEmpty,
+           let characters = event.characters,
+           characters.count == 1,
+           let digit = characters.first?.wholeNumberValue {
+            let candidateIndex = digit == 0 ? 9 : digit - 1
+            guard engine.candidates.indices.contains(candidateIndex) else { return true }
+            commit(engine.candidates[candidateIndex], sender: sender)
+            return true
+        }
+
         guard let characters = event.characters?.lowercased(), characters.count == 1,
               let character = characters.first, character.isASCII, character.isLetter else {
             if !engine.composition.isEmpty, let text = event.characters, !text.isEmpty {
@@ -88,14 +101,14 @@ final class InputController: IMKInputController {
     }
 
     private func updateMarkedText(_ sender: Any) {
-        guard let client = sender as? IMKTextInput else { return }
+        guard let client = textInput(from: sender) else { return }
         let text = NSAttributedString(string: engine.composition)
         client.setMarkedText(text, selectionRange: NSRange(location: text.length, length: 0),
                              replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
     }
 
     private func commit(_ text: String, sender: Any) {
-        guard let client = sender as? IMKTextInput else { return }
+        guard let client = textInput(from: sender) else { return }
         client.insertText(text, replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
         engine.clear()
         refresh(sender)
@@ -104,5 +117,22 @@ final class InputController: IMKInputController {
     private func commitRawComposition(_ sender: Any) {
         guard !engine.composition.isEmpty else { return }
         commit(engine.composition, sender: sender)
+    }
+
+    // On recent macOS releases, an InputMethodKit client can arrive through an
+    // Objective-C proxy that does not always satisfy Swift's conditional cast.
+    // Check the protocol selectors on NSObject before using the Obj-C protocol.
+    private func textInput(from sender: Any) -> IMKTextInput? {
+        guard let object = sender as? NSObject else {
+            NSLog("Wenmo: input client is not an NSObject")
+            return nil
+        }
+        let insertSelector = #selector(IMKTextInput.insertText(_:replacementRange:))
+        let markedSelector = #selector(IMKTextInput.setMarkedText(_:selectionRange:replacementRange:))
+        guard object.responds(to: insertSelector), object.responds(to: markedSelector) else {
+            NSLog("Wenmo: input client does not implement IMKTextInput selectors")
+            return nil
+        }
+        return unsafeBitCast(object, to: IMKTextInput.self)
     }
 }
